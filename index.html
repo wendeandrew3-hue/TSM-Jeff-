@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSM Tours &amp; Travel | Explore Kenya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b141a; --surface:#111b21; --panel:#202c33; --line:rgba(134,150,160,.15);
+    --green:#25d366; --deep:#075e54; --bubble:#005c4b;
+    --text:#e9edef; --muted:#8696a0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6}
+  h1,h2,h3,.logo{font-family:'Archivo',sans-serif}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header{position:sticky;top:0;z-index:50;background:rgba(11,20,26,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+  .logo{font-weight:800;font-size:1.15rem;letter-spacing:.02em}
+  .logo span{color:var(--green)}
+  nav{display:flex;gap:22px;align-items:center;font-size:.92rem;color:var(--muted)}
+  nav a:hover{color:var(--green)}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#04231a;font-weight:600;padding:11px 20px;border-radius:999px;border:none;cursor:pointer;font-size:.95rem;font-family:'Inter',sans-serif;transition:transform .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--green);border:1px solid var(--green)}
+  /* hero */
+  .hero{position:relative;overflow:hidden;padding:96px 0 72px}
+  .hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,20,26,.52) 0%,rgba(11,20,26,.68) 60%,var(--bg) 100%);z-index:1}
+  .hero .wrap{position:relative;z-index:2}
+  .kicker{color:var(--green);font-size:.8rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+  h1{font-size:clamp(2.2rem,5.5vw,3.6rem);line-height:1.08;margin:14px 0 16px;font-weight:800}
+  .hero p.sub{color:var(--muted);max-width:560px;font-size:1.05rem}
+  .hero-cta{margin-top:26px;display:flex;gap:14px;flex-wrap:wrap}
+  /* chat motif */
+  .chat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;max-width:420px;margin-top:44px}
+  .msg{border-radius:12px;padding:10px 14px;max-width:85%;font-size:.92rem;margin-bottom:12px;width:fit-content}
+  .msg.in{background:var(--panel);color:var(--text);border-top-left-radius:4px}
+  .msg.out{background:var(--bubble);color:#e9edef;margin-left:auto;border-top-right-radius:4px}
+  .msg small{display:block;font-size:.68rem;color:rgba(255,255,255,.45);text-align:right;margin-top:3px}
+  /* sections */
+  section{padding:64px 0}
+  .sec-head{margin-bottom:36px}
+  .sec-head h2{font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:800}
+  .sec-head p{color:var(--muted);margin-top:8px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .card img{width:100%;height:200px;object-fit:cover;display:block}
+  .card .body{padding:20px}
+  .card h3{font-size:1.1rem;margin-bottom:6px}
+  .card p{color:var(--muted);font-size:.92rem}
+  .card a{color:var(--green);font-weight:600;font-size:.9rem;margin-top:12px;display:inline-block}
+  .more{color:var(--muted);font-size:.9rem;margin-top:18px}
+  /* why us */
+  .why{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+  .why .item{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .why .num{color:var(--green);font-family:'Archivo';font-weight:800;font-size:1.3rem}
+  .why h3{font-size:1.05rem;margin:10px 0 8px}
+  .why p{color:var(--muted);font-size:.92rem}
+  /* jeff teaser */
+  .tease{background:linear-gradient(135deg,var(--deep),#0b3d33);border-radius:20px;padding:40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .tease h3{font-size:1.5rem;margin-bottom:8px}
+  .tease p{color:rgba(233,237,239,.75)}
+  /* cta band */
+  .band{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:52px 36px;text-align:center;margin:40px 0}
+  .band h2{font-size:clamp(1.4rem,3vw,2rem);margin-bottom:10px}
+  .band p{color:var(--muted);margin-bottom:24px}
+  footer{border-top:1px solid var(--line);padding:36px 0;color:var(--muted);font-size:.88rem}
+  footer .cols{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  @media(max-width:640px){nav .link{display:none} .hero{padding:48px 0 40px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <div class="logo">TSM <span>Tours &amp; Travel</span></div>
+    <nav>
+      <a class="link" href="#trips">Trips</a>
+      <a class="link" href="#why">Why Us</a>
+      <a class="link" href="jeff.html">Meet Jeff</a>
+      <a class="btn" href="https://wa.me/254746110058?text=Hi%20Jeff%2C%20I%20saw%20the%20TSM%20site%20and%20I%20want%20to%20plan%20a%20trip." target="_blank">WhatsApp Us</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <img class="bg" src="https://media.base44.com/images/public/6abb9d8658ca4f3d10f85c7a/825d63f60_generated_image.png" alt="Nairobi skyline at sunset with birds crossing the sky">
+  <div class="wrap">
+    <p class="kicker">TSM Tours &amp; Travel — Nairobi, Kenya</p>
+    <h1>Explore Kenya. One Trip At A Time.</h1>
+    <p class="sub">Safaris, beach escapes and group departures, planned for you from Nairobi. Tell us where you want to go, we handle the rest.</p>
+    <div class="hero-cta">
+      <a class="btn" href="https://wa.me/254746110058?text=Hi%20Jeff%2C%20I%20saw%20the%20TSM%20site%20and%20I%20want%20to%20plan%20a%20trip." target="_blank">Plan My Trip on WhatsApp</a>
+      <a class="btn ghost" href="jeff.html">Meet Your Trip Host</a>
+    </div>
+    <div class="chat" aria-hidden="true">
+      <div class="msg in">Hi Jeff, when is the next Mara trip?</div>
+      <div class="msg out">This Saturday. All-in group package. Shall I hold you a slot?<small>11:02 ✓✓</small></div>
+      <div class="msg in">Hold it. I'm in.</div>
+    </div>
+  </div>
+</section>
+
+<section id="trips">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Where Do You Want To Go?</h2>
+      <p>Our most requested trips. Pricing on WhatsApp, because every group is different.</p>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <img src="https://media.base44.com/images/public/6abb9d8658ca4f3d10f85c7a/efdd7c4b0_generated_image.png" alt="Maasai Mara safari at golden hour">
+        <div class="body">
+          <h3>Maasai Mara Safari</h3>
+          <p>The big five, the great migration, and a campfire at the end of it. Group departures from Nairobi.</p>
+          <a href="https://wa.me/254746110058?text=Hi%20Jeff%2C%20send%20me%20the%20Maasai%20Mara%20trip%20details." target="_blank">Get Mara details →</a>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://media.base44.com/images/public/6abb9d8658ca4f3d10f85c7a/b1b4873a4_generated_image.png" alt="Diani Beach Kenya with dhow boat">
+        <div class="body">
+          <h3>Diani Beach Escape</h3>
+          <p>White sand, warm Indian Ocean, dhow sunsets. The coast trip that resets your whole year.</p>
+          <a href="https://wa.me/254746110058?text=Hi%20Jeff%2C%20send%20me%20the%20Diani%20trip%20details." target="_blank">Get Diani details →</a>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://media.base44.com/images/public/6abb9d8658ca4f3d10f85c7a/7463a7ad3_generated_image.png" alt="Mount Kenya peaks at dawn">
+        <div class="body">
+          <h3>Mount Kenya Trail</h3>
+          <p>Point Lenana at sunrise, above the clouds. For the ones who want the story nobody else has.</p>
+          <a href="https://wa.me/254746110058?text=Hi%20Jeff%2C%20send%20me%20the%20Mount%20Kenya%20trip%20details." target="_blank">Get Mt Kenya details →</a>
+        </div>
+      </div>
+    </div>
+    <p class="more">Also on request: Naivasha &amp; Nakuru getaways, Amboseli, team-building trips and international travel.</p>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="sec-head"><h2>Why Travellers Choose TSM</h2></div>
+    <div class="why">
+      <div class="item"><div class="num">01</div><h3>Planned For You</h3><p>Itineraries built around your budget and dates. No confusing packages, no surprises.</p></div>
+      <div class="item"><div class="num">02</div><h3>Group Departures</h3><p>Join a scheduled trip out of Nairobi and travel with a crew. Solo-friendly, always.</p></div>
+      <div class="item"><div class="num">03</div><h3>One WhatsApp Away</h3><p>Every question, answered fast by a real person. From first message to boarding the van.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="tease">
+      <div>
+        <h3>Meet Jeff Kitono</h3>
+        <p>The man behind the trips. Your ambassador at TSM Tours &amp; Travel.</p>
+      </div>
+      <a class="btn" href="jeff.html">Meet Jeff →</a>
+    </div>
+    <div class="band">
+      <h2>Your Next Trip Starts With One Message.</h2>
+      <p>WhatsApp us now and get trip plans and pricing today.</p>
+      <a class="btn" href="https://wa.me/254746110058?text=Hi%20Jeff%2C%20I%20saw%20the%20TSM%20site%20and%20I%20want%20to%20plan%20a%20trip." target="_blank">Chat on WhatsApp — +254 746 110 058</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap cols">
+    <div>TSM Tours &amp; Travel — Nairobi, Kenya</div>
+    <div>Agro House, 7th Floor, Nairobi CBD (Gedi Street, off Tom Mboya St)</div>
+    <div><a href="https://wa.me/254746110058" target="_blank">WhatsApp +254 746 110 058</a></div>
+  </div>
+</footer>
+</body>
+</html>
