@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>TSM Admin — Leads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#0b141a; --green:#25d366; --deep:#128c7e; --line:#1f2c33; --paper:#ffffff; --muted:#8fa3ad; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--ink); color:#e9edef; font-family:'Inter',sans-serif; min-height:100vh; }
+  .wrap { max-width:960px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-family:'Archivo',sans-serif; font-size:26px; font-weight:700; color:var(--paper); }
+  .sub { color:var(--muted); font-size:14px; margin-top:4px; }
+  header { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; margin-bottom:24px; }
+  .btn { display:inline-block; background:var(--green); color:var(--ink); font-weight:600; font-size:14px; border:none; border-radius:8px; padding:10px 18px; cursor:pointer; font-family:'Inter',sans-serif; }
+  .btn:hover { filter:brightness(1.07); }
+
+  /* login card */
+  .gate { max-width:360px; margin:12vh auto 0; background:#111b21; border:1px solid var(--line); border-radius:14px; padding:28px; text-align:center; }
+  .gate h1 { font-size:20px; margin-bottom:6px; }
+  .gate p { color:var(--muted); font-size:13px; margin-bottom:18px; }
+  .gate input { width:100%; background:var(--ink); border:1px solid var(--line); border-radius:8px; color:#e9edef; padding:12px 14px; font-size:15px; font-family:'Inter',sans-serif; }
+  .gate input:focus { outline:2px solid var(--deep); }
+  .gate .btn { width:100%; margin-top:14px; }
+  .gate .err { color:#ef6b6b; font-size:13px; margin-top:10px; min-height:16px; }
+
+  /* table */
+  .stats { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+  .stat { background:#111b21; border:1px solid var(--line); border-radius:10px; padding:12px 18px; min-width:110px; }
+  .stat b { display:block; font-size:22px; color:var(--paper); font-family:'Archivo',sans-serif; }
+  .stat span { font-size:12px; color:var(--muted); }
+  .tblbox { background:#111b21; border:1px solid var(--line); border-radius:12px; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:14px; white-space:nowrap; }
+  th { text-align:left; font-family:'Archivo',sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:12px 14px; border-bottom:1px solid var(--line); }
+  td { padding:12px 14px; border-bottom:1px solid #16211f; color:#e9edef; }
+  tr:last-child td { border-bottom:none; }
+  td a { color:var(--green); text-decoration:none; }
+  .tag { display:inline-block; background:rgba(37,211,102,.12); color:var(--green); border-radius:20px; padding:3px 10px; font-size:12px; }
+  .wa { color:var(--green); text-decoration:none; margin-right:10px; }
+  .empty { text-align:center; color:var(--muted); padding:40px 14px; }
+  footer { margin-top:26px; color:var(--muted); font-size:12px; text-align:center; }
+</style>
+</head>
+<body>
+
+<!-- login -->
+<div class="gate" id="gate">
+  <h1>TSM Admin</h1>
+  <p>Enter the admin password to view leads.</p>
+  <form id="loginform">
+    <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" required>
+    <button class="btn" type="submit" id="loginbtn">View leads</button>
+    <div class="err" id="gateerr"></div>
+  </form>
+</div>
+
+<!-- dashboard -->
+<div class="wrap" id="dash" style="display:none">
+  <header>
+    <div>
+      <h1>TSM Leads</h1>
+      <p class="sub" id="count">—</p>
+    </div>
+    <div>
+      <button class="btn" id="csv" type="button">Export CSV</button>
+      <button class="btn" id="refresh" type="button" style="background:#111b21;color:#e9edef;border:1px solid var(--line)">Refresh</button>
+    </div>
+  </header>
+  <div class="stats" id="stats"></div>
+  <div class="tblbox">
+    <table id="tbl">
+      <thead>
+        <tr><th>Date</th><th>Name</th><th>Phone</th><th>Email</th><th>Interest</th><th>Source</th><th>Contact</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">No leads yet. They'll show up here the moment the form is used.</div>
+  </div>
+  <footer>TSM Tours &amp; Travel · internal use only</footer>
+</div>
+
+<script>
+var API = 'https://superagent-10f85c7a.base44.app/functions/listTsmLeads';
+var leads = [];
+
+function esc(s){ var d=document.createElement('div'); d.textContent=String(s==null?'':s); return d.innerHTML; }
+function fmtDate(iso){
+  var d = new Date(iso); if (isNaN(d)) return '—';
+  return d.toLocaleDateString('en-KE',{day:'numeric',month:'short'}) + ' ' +
+         d.toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit',hour12:false});
+}
+
+async function load(password){
+  var r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: password }) });
+  var data = await r.json().catch(function(){ return {}; });
+  if (r.status === 401) { document.getElementById('gateerr').textContent = 'Wrong password.'; return false; }
+  if (!data.ok) { document.getElementById('gateerr').textContent = 'Could not load leads. Try again.'; return false; }
+  leads = data.leads || [];
+  render();
+  return true;
+}
+
+function render(){
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('dash').style.display = 'block';
+  document.getElementById('count').textContent = leads.length + ' lead' + (leads.length===1?'':'s') + ' · newest first';
+
+  var interests = {};
+  leads.forEach(function(l){ var i = l.interest || 'Unspecified'; interests[i]=(interests[i]||0)+1; });
+  var week = leads.filter(function(l){ return (Date.now()-new Date(l.created_date))/864e5 < 7; }).length;
+
+  var st = '<div class="stat"><b>'+leads.length+'</b><span>Total leads</span></div>'
+          + '<div class="stat"><b>'+week+'</b><span>Last 7 days</span></div>';
+  Object.keys(interests).slice(0,3).forEach(function(i){
+    st += '<div class="stat"><b>'+esc(i)+'</b><span>'+interests[i]+' interested</span></div>';
+  });
+  document.getElementById('stats').innerHTML = st;
+
+  var rows = '';
+  leads.forEach(function(l){
+    var wa = String(l.phone||'').replace(/[^0-9]/g,'');
+    if (wa.length===10 && wa[0]==='0') wa = '254'+wa.slice(1);
+    rows += '<tr>'
+      + '<td>'+esc(fmtDate(l.created_date))+'</td>'
+      + '<td>'+esc(l.full_name)+'</td>'
+      + '<td>'+esc(l.phone)+'</td>'
+      + '<td>'+esc(l.email||'—')+'</td>'
+      + '<td><span class="tag">'+esc(l.interest||'—')+'</span></td>'
+      + '<td>'+esc(l.source)+'</td>'
+      + '<td>'+(wa?'<a class="wa" href="https://wa.me/'+wa+'" target="_blank">WhatsApp</a>':'')+'</td>'
+      + '</tr>';
+  });
+  document.getElementById('rows').innerHTML = rows;
+  document.getElementById('empty').style.display = leads.length ? 'none' : 'block';
+}
+
+document.getElementById('loginform').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var btn = document.getElementById('loginbtn');
+  btn.disabled = true; btn.textContent = 'Checking...';
+  var ok = await load(document.getElementById('pw').value);
+  btn.disabled = false; btn.textContent = 'View leads';
+  if (ok) { sessionStorage.setItem('tsm_admin_pw', document.getElementById('pw').value); }
+});
+
+document.getElementById('refresh').addEventListener('click', function(){
+  load(sessionStorage.getItem('tsm_admin_pw'));
+});
+
+document.getElementById('csv').addEventListener('click', function(){
+  var lines = ['Date,Name,Phone,Email,Interest,Source'];
+  leads.forEach(function(l){
+    function c(s){ return '"'+String(s==null?'':s).replace(/"/g,'""')+'"'; }
+    lines.push([c(fmtDate(l.created_date)),c(l.full_name),c(l.phone),c(l.email),c(l.interest),c(l.source)].join(','));
+  });
+  var blob = new Blob([lines.join('\n')], { type:'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tsm-leads.csv';
+  a.click();
+});
+
+var saved = sessionStorage.getItem('tsm_admin_pw');
+if (saved) load(saved);
+</script>
+</body>
+</html>
